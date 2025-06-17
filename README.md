@@ -126,11 +126,18 @@ All dokumentation är tillgänglig på:
 
 ## ✅ Enhetstestning (Jest + Supertest)
 
-Applikationen innehåller en testfil som verifierar ett komplett API-flöde:
+Applikationen innehåller en testfil som verifierar ett komplett API-flöde inklusive felhantering och autentisering.
 
-- Skapa anteckning
-- Hämta anteckningar
-- Radera anteckning
+### Testar bland annat:
+
+- ❌ Skapa anteckning utan token → 401
+- ❌ Skapa anteckning utan titel → 400
+- ✅ Skapa anteckning
+- ✅ Hämta anteckningar
+- ✅ Sök anteckning
+- ✅ Uppdatera anteckning
+- ✅ Radera anteckning
+- ❌ Försök radera redan borttagen anteckning → 404
 
 ### 🧪 Köra tester
 

@@ -1,30 +1,33 @@
 const { Op } = require('sequelize');
 const Note = require('../models/Note');
 
-exports.getNotes = async (req, res) => {
+exports.getNotes = async (req, res, next) => {
   try {
-    console.log('GET req.user:', req.user);
     const notes = await Note.findAll({
       where: { userId: req.user.userId },
       order: [['createdAt', 'DESC']]
     });
     res.status(200).json(notes);
   } catch (err) {
-    console.error('GET error:', err);
-    res.status(500).json({ message: 'Kunde inte hämta anteckningar' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };
 
-exports.createNote = async (req, res) => {
+exports.createNote = async (req, res, next) => {
   try {
     const { title, text } = req.body;
 
     if (!title || !text) {
-      return res.status(400).json({ message: 'Titel och text krävs' });
+      const error = new Error('Titel och text krävs');
+      error.statusCode = 400;
+      throw error;
     }
 
     if (title.length > 50 || text.length > 300) {
-      return res.status(400).json({ message: 'Titel eller text överskrider maxlängd' });
+      const error = new Error('Titel eller text överskrider maxlängd');
+      error.statusCode = 400;
+      throw error;
     }
 
     const note = await Note.create({
@@ -37,25 +40,30 @@ exports.createNote = async (req, res) => {
 
     res.status(201).json(note);
   } catch (err) {
-    console.error('CREATE error:', err);
-    res.status(500).json({ message: 'Kunde inte skapa anteckning' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };
 
-exports.updateNote = async (req, res) => {
+exports.updateNote = async (req, res, next) => {
   try {
-    console.log('UPDATE req.user:', req.user);
     const { id, title, text } = req.body;
 
     if (!id || !title || !text) {
-      return res.status(400).json({ message: 'ID, titel och text krävs' });
+      const error = new Error('ID, titel och text krävs');
+      error.statusCode = 400;
+      throw error;
     }
 
     const note = await Note.findOne({
       where: { id, userId: req.user.userId }
     });
 
-    if (!note) return res.status(404).json({ message: 'Anteckning hittades inte' });
+    if (!note) {
+      const error = new Error('Anteckning hittades inte');
+      error.statusCode = 404;
+      throw error;
+    }
 
     note.title = title;
     note.text = text;
@@ -64,37 +72,48 @@ exports.updateNote = async (req, res) => {
     await note.save();
     res.status(200).json(note);
   } catch (err) {
-    console.error('UPDATE error:', err);
-    res.status(500).json({ message: 'Kunde inte uppdatera anteckning' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };
 
-exports.deleteNote = async (req, res) => {
+exports.deleteNote = async (req, res, next) => {
   try {
-    console.log('DELETE req.user:', req.user);
     const { id } = req.body;
 
-    if (!id) return res.status(400).json({ message: 'ID krävs för att radera' });
+    if (!id) {
+      const error = new Error('ID krävs för att radera');
+      error.statusCode = 400;
+      throw error;
+    }
 
     const note = await Note.findOne({
       where: { id, userId: req.user.userId }
     });
 
-    if (!note) return res.status(404).json({ message: 'Anteckning hittades inte' });
+    if (!note) {
+      const error = new Error('Anteckning hittades inte');
+      error.statusCode = 404;
+      throw error;
+    }
 
     await note.destroy();
     res.status(200).json({ message: 'Anteckning raderad' });
   } catch (err) {
-    console.error('DELETE error:', err);
-    res.status(500).json({ message: 'Kunde inte ta bort anteckning' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };
 
-exports.searchNotes = async (req, res) => {
+exports.searchNotes = async (req, res, next) => {
   try {
-    console.log('SEARCH req.user:', req.user);
     const { title } = req.query;
-    if (!title) return res.status(400).json({ message: 'Sökord saknas' });
+
+    if (!title) {
+      const error = new Error('Sökord saknas');
+      error.statusCode = 400;
+      throw error;
+    }
 
     const notes = await Note.findAll({
       where: {
@@ -105,7 +124,7 @@ exports.searchNotes = async (req, res) => {
 
     res.status(200).json(notes);
   } catch (err) {
-    console.error('SEARCH error:', err);
-    res.status(500).json({ message: 'Kunde inte söka anteckningar' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };
