@@ -1,6 +1,6 @@
 # 🗒️ SwingNotes API
 
-![Run Backend Tests](https://github.com/<elinstella>/<SwingNotes>/actions/workflows/tests.yml/badge.svg)
+![Run Backend Tests](https://github.com/elinstella/SwingNotes/actions/workflows/tests.yml/badge.svg)
 
 > Ett säkert och fullständigt backend-API för att hantera användare och deras anteckningar.
 
