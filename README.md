@@ -1,6 +1,44 @@
 # 🗒️ SwingNotes API
 
-Ett säkert och fullständigt backend-API för att hantera användare och deras anteckningar.
+![Run Backend Tests](https://github.com/<elinstella>/<SwingNotes>/actions/workflows/tests.yml/badge.svg)
+
+> Ett säkert och fullständigt backend-API för att hantera användare och deras anteckningar.
+
+---
+
+## ⚙️ Installation
+
+1. **Klona projektet**
+
+   ```bash
+   git clone https://github.com/<användarnamn>/<repo-namn>.git
+   cd <repo-namn>
+   ```
+
+2. **Installera beroenden**
+
+   ```bash
+   npm install
+   ```
+
+3. **Skapa `.env`-fil**  
+   Lägg till en `.env`-fil i projektroten med följande variabler:
+
+   ```env
+   DB_NAME=swingnotes_db
+   DB_USER=postgres
+   DB_PASSWORD=postgres
+   DB_HOST=localhost
+   JWT_SECRET=din_hemliga_nyckel
+   ```
+
+4. **Starta utvecklingsservern**
+   ```bash
+   node server.js
+   ```
+
+> Servern körs på: `http://localhost:3000`  
+> Swagger-dokumentation finns på: `http://localhost:3000/api-docs`
 
 ---
 
@@ -29,7 +67,7 @@ Ett säkert och fullständigt backend-API för att hantera användare och deras 
 
 ## 🔑 Autentisering
 
-Alla endpoints (förutom `signup` och `login`) kräver en Bearer Token (JWT) i `Authorization`-headern:
+Alla endpoints (förutom `signup` och `login`) kräver en Bearer Token (JWT) i `Authorization`-headern.
 
 ---
 
@@ -96,32 +134,11 @@ Applikationen innehåller en testfil som verifierar ett komplett API-flöde:
 
 ### 🧪 Köra tester
 
-Kör följande kommando i terminalen:
-
 ```bash
 npm test
 ```
 
-Testfil:  
-`tests/notesFlow.test.js`
-
-Alla tester använder `Supertest` för att simulera HTTP-förfrågningar mot appen, och körs mot en temporär testdatabas. Detta säkerställer att:
-
-- API:et fungerar enligt specifikation
-- Felhantering fungerar korrekt
-- Databasen interagerar som förväntat
-
-### 💡 Exempelutgång
-
-```bash
-PASS  tests/notesFlow.test.js
-  Fullt API-flöde
-    ✓ Skapar en anteckning
-    ✓ Hämtar anteckningar
-    ✓ Tar bort anteckningen
-```
-
-> Dessa tester är en viktig del för att säkerställa kvalitet och stabilitet i backendlösningen.
+> Testfil: `tests/notesFullFlow.test.js`
 
 ---
 
