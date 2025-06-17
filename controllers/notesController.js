@@ -3,6 +3,7 @@ const Note = require('../models/Note');
 
 exports.getNotes = async (req, res) => {
   try {
+    console.log('GET req.user:', req.user);
     const notes = await Note.findAll({
       where: { userId: req.user.userId },
       order: [['createdAt', 'DESC']]
@@ -43,13 +44,17 @@ exports.createNote = async (req, res) => {
 
 exports.updateNote = async (req, res) => {
   try {
+    console.log('UPDATE req.user:', req.user);
     const { id, title, text } = req.body;
 
     if (!id || !title || !text) {
       return res.status(400).json({ message: 'ID, titel och text krävs' });
     }
 
-    const note = await Note.findOne({ where: { id, userId: req.user.userId } });
+    const note = await Note.findOne({
+      where: { id, userId: req.user.userId }
+    });
+
     if (!note) return res.status(404).json({ message: 'Anteckning hittades inte' });
 
     note.title = title;
@@ -57,7 +62,6 @@ exports.updateNote = async (req, res) => {
     note.modifiedAt = new Date();
 
     await note.save();
-
     res.status(200).json(note);
   } catch (err) {
     console.error('UPDATE error:', err);
@@ -67,15 +71,18 @@ exports.updateNote = async (req, res) => {
 
 exports.deleteNote = async (req, res) => {
   try {
+    console.log('DELETE req.user:', req.user);
     const { id } = req.body;
 
     if (!id) return res.status(400).json({ message: 'ID krävs för att radera' });
 
-    const note = await Note.findOne({ where: { id, userId: req.user.userId } });
+    const note = await Note.findOne({
+      where: { id, userId: req.user.userId }
+    });
+
     if (!note) return res.status(404).json({ message: 'Anteckning hittades inte' });
 
     await note.destroy();
-
     res.status(200).json({ message: 'Anteckning raderad' });
   } catch (err) {
     console.error('DELETE error:', err);
@@ -85,6 +92,7 @@ exports.deleteNote = async (req, res) => {
 
 exports.searchNotes = async (req, res) => {
   try {
+    console.log('SEARCH req.user:', req.user);
     const { title } = req.query;
     if (!title) return res.status(400).json({ message: 'Sökord saknas' });
 
