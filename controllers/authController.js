@@ -2,37 +2,47 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const User = require('../models/User');
 
-exports.signup = async (req, res) => {
+exports.signup = async (req, res, next) => {
   try {
     const { username, password } = req.body;
-    if (!username || !password) return res.status(400).json({ message: 'Användarnamn och lösenord krävs.' });
+    if (!username || !password) {
+      const error = new Error('Användarnamn och lösenord krävs.');
+      error.statusCode = 400;
+      throw error;
+    }
 
     const hashedPassword = await bcrypt.hash(password, 10);
     const user = await User.create({ username, password: hashedPassword });
 
     res.status(201).json({ message: 'Konto skapat', userId: user.id });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Fel vid skapande av användare' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };
 
-
-exports.login = async (req, res) => {
+exports.login = async (req, res, next) => {
   try {
     const { username, password } = req.body;
     const user = await User.findOne({ where: { username } });
 
-    if (!user) return res.status(404).json({ message: 'Användare finns inte' });
+    if (!user) {
+      const error = new Error('Användare finns inte');
+      error.statusCode = 404;
+      throw error;
+    }
 
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(401).json({ message: 'Fel lösenord' });
+    if (!isMatch) {
+      const error = new Error('Fel lösenord');
+      error.statusCode = 401;
+      throw error;
+    }
 
     const token = jwt.sign({ userId: user.id }, process.env.JWT_SECRET, { expiresIn: '1h' });
-
     res.status(200).json({ message: 'Inloggad', token });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ message: 'Fel vid inloggning' });
+    err.statusCode = err.statusCode || 500;
+    next(err);
   }
 };

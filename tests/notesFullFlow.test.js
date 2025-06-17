@@ -103,3 +103,10 @@ describe('🧪 Fullständigt API-flöde', () => {
     expect(res.statusCode).toBe(404);
   });
 });
+
+it('🧨 Fångar globalt fel korrekt → 418', async () => {
+  const res = await request(app).get('/api/test-error');
+  expect(res.statusCode).toBe(418);
+  expect(res.body.message).toBe('Detta är ett testfel');
+});
+
